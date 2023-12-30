@@ -38,21 +38,23 @@ def main(is_continue):
     # 损失函数
     loss_fn = MaskedSoftmaxCELoss(max_length=opt.max_len)
 
-    # 优化器
-    optimizer = optim.Adam(params=model.parameters(), lr=opt.lr, betas=(opt.beta1, opt.beta2), eps=opt.eps)
-
     # 参数初始化
     if is_continue:
         # 加载已保存的模型参数
         checkpoint = torch.load(os.path.join(opt.weight_path, 'checkpoint.pth'))
         model.load_state_dict(checkpoint['model_state_dict'])
         epoch = checkpoint['epoch'] + 1
-        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+        lr = checkpoint['lr']
     else:
         epoch = 0
         model.apply(init_weights)
+        lr = opt.lr
+
+    # 优化器
+    optimizer = optim.Adam(params=model.parameters(), lr=lr, betas=(opt.beta1, opt.beta2), eps=opt.eps)
+
     # 学习率衰减策略
-    lr_scheduler = WarmupInverseSqrtDecay(optimizer, d_model=opt.embed_dim, warmup_steps=opt.warmup_steps)
+    lr_scheduler = WarmupInverseSqrtDecay(optimizer, d_model=opt.embed_dim, warmup_steps=opt.warmup_steps, steps=epoch)
 
     # 配置日志记录器
     if not os.path.exists(opt.logs_path):
@@ -65,8 +67,9 @@ def main(is_continue):
         checkpoint = train_epoch(model, train_dataloader, optimizer, loss_fn, lr_scheduler, opt.device[0], epoch)
         if (epoch + 1) % 5 == 0:
             torch.save(checkpoint, os.path.join(opt.weight_path, 'checkpoint.pth'))
-    # 模型评估
-    mean_bleu = evaluate(model.module, valid_dataloader, opt.device[0])
+            # 模型评估
+            mean_bleu = evaluate(model.module, valid_dataloader, opt.device[0])
+            print(f"the bleu of test is: {mean_bleu:.4f}")
 
 
 if __name__ == "__main__":
