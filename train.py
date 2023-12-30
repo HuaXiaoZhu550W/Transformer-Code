@@ -38,6 +38,6 @@ def train_epoch(model, dataloader, optimizer, loss_fn, lr_scheduler, device, epo
     pbar.close()
     checkpoint = {'epoch': epoch,
                   'model_state_dict': model.module.state_dict(),
-                  'optimizer_state_dict': optimizer.state_dict()
+                  'lr': optimizer.param_groups[0]['lr']
                   }
     return checkpoint
