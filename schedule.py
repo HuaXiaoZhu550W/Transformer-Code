@@ -3,12 +3,12 @@ import torch
 
 # 学习率下降策略(热身反平方衰减)
 class WarmupInverseSqrtDecay:
-    def __init__(self, optimizer, d_model, warmup_steps):
+    def __init__(self, optimizer, d_model, warmup_steps, steps):
         super(WarmupInverseSqrtDecay, self).__init__()
         self.optimizer = optimizer
         self.d_model = torch.tensor(d_model, dtype=torch.float32)
         self.warmup_steps = warmup_steps
-        self.steps = 1.0  # 当前step
+        self.steps = float(steps+1)  # 当前step
 
     def step(self):
         lr = self.optimizer.param_groups[0]['lr'] * (self.d_model ** -0.5) * \
