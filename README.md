@@ -17,5 +17,6 @@
 ### 4.在eval.py文件中定义了评估函数，使用bleu作为评价指标，可在test数据集上对模型训练结果进行评估。
 ### 5.在demo.py文件中可以对训练好的模型进行演示。
 # 最后
-### 关于论文的讲解，推荐去B站看李沐老师的视频，地址https://www.bilibili.com/video/BV1pu411o7BE/。github仓库https://github.com/mli/paper-reading
+### 关于论文的讲解，推荐去B站看李沐老师的视频，地址：https://www.bilibili.com/video/BV1pu411o7BE/
+### github仓库：https://github.com/mli/paper-reading
 ### 作为一个学习者，项目还存在很多不足，期望有大佬能够多多提供宝贵的建议；很多由于算力有限，没有能够完成训练，后续会在合适时间完成训练，并且上传我的训练成果。
