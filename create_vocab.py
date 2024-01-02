@@ -18,6 +18,6 @@ with open('source.pkl', 'wb') as f:
 # 生成目标语言词表
 tar_vocab = Vocab(tokens=en_tokenize, min_freq=3, reserved_tokens=['<pad>', '<bos>', '<eos>'])
 with open('target.pkl', 'wb') as f:
-    pickle.dump(src_vocab, f)
+    pickle.dump(tar_vocab, f)
 
 
