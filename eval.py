@@ -40,3 +40,28 @@ def evaluate(model, dataloader, device):
     pbar.close()
 
     return total_bleu / iterations
+
+
+# if __name__ == "__main__":
+#     from Model import Transformer
+#     import os
+#     from Dataset import load_data
+#     # 搭建模型
+#     model = Transformer(source_vocab=opt.src_vocab,
+#                         target_vocab=opt.tar_vocab,
+#                         embed_dim=opt.embed_dim,
+#                         num_heads=opt.num_heads,
+#                         ffn_hiddens=opt.ffn_hiddens,
+#                         num_layers=opt.num_layers,
+#                         max_len = opt.max_len,
+#                         dropout=opt.dropout
+#                         )
+#     # 加载模型参数
+#     checkpoint = torch.load(os.path.join(opt.weight_path, 'checkpoint.pth'), map_location=torch.device('cpu'))
+#     model.load_state_dict(checkpoint['model_state_dict'])
+#
+#     # 加载数据
+#     valid_dataloader = load_data(zh_path=opt.test_path['zh'], en_path=opt.test_path['en'],
+#                                  batch_size=opt.eval_batch, is_train=False, num_workers=4)
+#     mean_bleu = evaluate(model, valid_dataloader, 'cpu')
+#     print(f"bleu: {mean_bleu:.4f}")

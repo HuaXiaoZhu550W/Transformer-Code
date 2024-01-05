@@ -17,23 +17,20 @@ class MultiHeadAttention(nn.Module):
 
         assert (self.head_dim * num_heads == embed_dim), "Embedding dim needs to be divisible by heads"
 
-        self.keys = nn.Linear(self.head_dim, self.head_dim, bias=False)
-        self.values = nn.Linear(self.head_dim, self.head_dim, bias=False)
-        self.queries = nn.Linear(self.head_dim, self.head_dim, bias=False)
-        self.out_layer = nn.Linear(self.head_dim * num_heads, embed_dim)
+        self.keys = nn.Linear(embed_dim, embed_dim, bias=False)
+        self.values = nn.Linear(embed_dim, embed_dim, bias=False)
+        self.queries = nn.Linear(embed_dim, embed_dim, bias=False)
+        self.out_layer = nn.Linear(embed_dim, embed_dim)
 
     def forward(self, keys, values, queries, mask):
-        N = queries.shape[0]  # batch_size
-        key_len, value_len, query_len = keys.shape[1], values.shape[1], queries.shape[1]
+        # 将embed_dim 拆分为num_heads份, 每一份head_dim
+        # keys shape: (N, key_len, embed_dim) split后: (N, num_heads, key_len, head_dim)
+        # values shape: (N, value_len, embed_dim) split后: (N, num_heads, value_len, head_dim)
+        # queries shape: (N, query_len, embed_dim) split后: (N, num_heads, query_len head_dim)
 
-        # 将embed_dim 拆分为num_heads份, 每一份head_dim, reshape后放入Linear层
-        # keys shape: (N, key_len, embed_dim) reshape: (N, key_len, num_heads, head_dim)
-        # values shape: (N, value_len, embed_dim) reshape: (N, value_len, num_heads, head_dim)
-        # queries shape: (N, query_len, embed_dim) reshape: (N, query_len, num_heads, head_dim)
-
-        keys = self.keys(keys.reshape(N, self.num_heads, key_len, self.head_dim))
-        values = self.values(values.reshape(N, self.num_heads, value_len, self.head_dim))
-        queries = self.queries(queries.reshape(N, self.num_heads, query_len, self.head_dim))
+        keys = self.split(self.keys(keys))
+        values = self.split(self.values(values))
+        queries = self.split(self.queries(queries))
 
         # queries*keys -> energy shape: (N, num_heads, query_len, key_len)
         energy = torch.einsum('nhqd, nhkd -> nhqk', [queries, keys]) / self.embed_dim ** (1 / 2)
@@ -51,6 +48,14 @@ class MultiHeadAttention(nn.Module):
         # attention*values -> att_out shape: (N, query_len, num_heads, head_dim)
         att_out = torch.einsum('nhql, nhld -> nhqd', [attention, values])
 
-        output = self.out_layer(att_out.reshape(N, query_len, self.num_heads * self.head_dim))
+        return self.out_layer(self.concat(att_out))
 
-        return output
+    def split(self, X):
+        # X shape: (N, max_len, embed_dim)
+        X = X.view(X.shape[0], X.shape[1], self.num_heads, self.head_dim)
+        return X.transpose(1, 2)
+
+    def concat(self, X):
+        # X shape: (N, num_heads, max_len, head_dim)
+        X = X.transpose(1, 2)
+        return X.reshape(X.shape[0], X.shape[1], self.embed_dim)

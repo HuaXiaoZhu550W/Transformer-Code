@@ -23,18 +23,17 @@ class TextDataset(Dataset):
         else:
             source_length = len(self.source[idx]) + 2
 
-        if len(self.target[idx]) > self.max_length-2:
-            self.target[idx] = self.target[idx][: self.max_length-2]
+        if len(self.target[idx]) > self.max_length-1:
+            self.target[idx] = self.target[idx][: self.max_length-1]
             target_length = self.max_length
         else:
-            target_length = len(self.target[idx]) + 2
+            target_length = len(self.target[idx]) + 1
 
         source = torch.tensor([self.source_vocab['<bos>']] +
                               self.source_vocab[self.source[idx]] +
                               [self.source_vocab['<eos>']] +
                               [self.source_vocab['<pad>']] * (self.max_length-source_length))
-        target = torch.tensor([self.target_vocab['<bos>']] +
-                              self.target_vocab[self.target[idx]] +
+        target = torch.tensor(self.target_vocab[self.target[idx]] +
                               [self.target_vocab['<eos>']] +
                               [self.target_vocab['<pad>']] * (self.max_length - target_length))
 

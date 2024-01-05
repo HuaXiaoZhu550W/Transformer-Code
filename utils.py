@@ -82,16 +82,6 @@ def try_all_gpus():
     return device if device else [torch.device('cpu')]
 
 
-def make_positional_encoding(embed_dim, max_length):
-    """生成位置编码"""
-    # positions shape: (1, max_length, embed_dim)
-    positions = torch.zeros((1, max_length, embed_dim))
-    x = torch.arange(max_length).reshape((-1, 1)) / torch.pow(10000, torch.arange(0, embed_dim, 2) / embed_dim)
-    positions[:, :, 0::2] = torch.sin(x)
-    positions[:, :, 1::2] = torch.sin(x)
-    return positions
-
-
 def make_pad_mask(lens, max_length):
     """
     生成填充掩码

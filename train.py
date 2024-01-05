@@ -1,6 +1,8 @@
+import torch
 from tqdm import tqdm
 import logging
 from utils import grad_clipping
+from config import opt
 
 
 def train_epoch(model, dataloader, optimizer, loss_fn, lr_scheduler, device, epoch):
@@ -18,9 +20,13 @@ def train_epoch(model, dataloader, optimizer, loss_fn, lr_scheduler, device, epo
 
     for iteration, batch_iter in enumerate(dataloader):
         source, target, source_length, target_length = [x.to(device) for x in batch_iter]
-        output = model(source, source_length, target[:, :-1], target_length)
+        # 添加起始字符"<bos>"
+        bos = torch.tensor([opt.tar_vocab['<bos>']] * target.shape[0], device=device).reshape(-1, 1)
+        dec_input = torch.cat([bos, target[:, :-1]], dim=1)
+
+        output = model(source, source_length, dec_input, target_length)
         optimizer.zero_grad()
-        loss = loss_fn(output, target[:, 1:], target_length)
+        loss = loss_fn(output, target, target_length)
         loss.backward()
         grad_clipping(model, 1)
         lr_scheduler.step()  # 更新学习率
@@ -36,8 +42,10 @@ def train_epoch(model, dataloader, optimizer, loss_fn, lr_scheduler, device, epo
                             'device': f"{source.device}"})
         pbar.update(1)
     pbar.close()
+    # 在checkpoint中保存当前训练的epoch, 当前模型参数, 当前学习率, 当前学习率更新的steps(记录当前运行了多少个iteration)
     checkpoint = {'epoch': epoch,
                   'model_state_dict': model.module.state_dict(),
-                  'lr': optimizer.param_groups[0]['lr']
+                  'lr': optimizer.param_groups[0]['lr'],
+                  'steps': lr_scheduler.steps
                   }
     return checkpoint

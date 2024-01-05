@@ -11,8 +11,7 @@ class WarmupInverseSqrtDecay:
         self.steps = float(steps+1)  # 当前step
 
     def step(self):
-        lr = self.optimizer.param_groups[0]['lr'] * (self.d_model ** -0.5) * \
-             min(self.steps ** -0.5, self.steps * (self.warmup_steps ** -1.5))
+        lr = (self.d_model ** -0.5) * min(self.steps ** -0.5, self.steps * (self.warmup_steps ** -1.5))
         self.steps += 1.
         # 更新学习率
         for p in self.optimizer.param_groups:
