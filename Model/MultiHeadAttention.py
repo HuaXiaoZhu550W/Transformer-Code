@@ -45,7 +45,7 @@ class MultiHeadAttention(nn.Module):
         # attention shape: (N, num_heads, query_len, key_len)
         # values shape: (N, num_heads, value_len, head_dim)
         # value_len == key_len, 都用l表示
-        # attention*values -> att_out shape: (N, query_len, num_heads, head_dim)
+        # attention*values -> att_out shape: (N, num_heads,query_len, head_dim)
         att_out = torch.einsum('nhql, nhld -> nhqd', [attention, values])
 
         return self.out_layer(self.concat(att_out))
