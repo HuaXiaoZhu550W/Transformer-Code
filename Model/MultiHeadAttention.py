@@ -33,7 +33,7 @@ class MultiHeadAttention(nn.Module):
         queries = self.split(self.queries(queries))
 
         # queries*keys -> energy shape: (N, num_heads, query_len, key_len)
-        energy = torch.einsum('nhqd, nhkd -> nhqk', [queries, keys]) / self.embed_dim ** (1 / 2)
+        energy = torch.einsum('nhqd, nhkd -> nhqk', [queries, keys]) / self.head_dim ** (1 / 2)
 
         # 添加mask, shape: (N, 1, query_len, key_len)
         if mask is not None:
