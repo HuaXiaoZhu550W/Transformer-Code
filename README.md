@@ -12,11 +12,11 @@
 # 使用说明
 ### 1.如果需要使用自己的数据集，需要修改utils.py文件中文本读取，词元化相关代码。
 ### 2.可以在cofig.py文件中修改超参数。
-### 3.在schedule.py中，实现了论文中学习率调整策略 $lrate = {embed_dim}^{-0.5}$
-### 3.运行main.py即可开始训练。
-### 4.在运行main.py文件之前，需要先运行create_vocab.py文件生成自己的词表。
-### 4.在eval.py文件中定义了评估函数，使用bleu作为评价指标，可在test数据集上对模型训练结果进行评估。
-### 5.在demo.py文件中可以对训练好的模型进行演示。
+### 3.在schedule.py中，实现了论文中学习率调整策略 $lrate = d_{model}^{-0.5}\cdotmin(step^{-0.5}, step\cdotwarmup^{-1.5})$；其中$d_{model}$是模型的embed_dim，$step$是模型当前训练步数，$warmup$是热身训练步数。
+### 4.运行main.py即可开始训练。
+### 5.在运行main.py文件之前，需要先运行create_vocab.py文件生成自己的词表。
+### 6.在eval.py文件中定义了评估函数，使用bleu作为评价指标，可在test数据集上对模型训练结果进行评估。
+### 7.在demo.py文件中可以对训练好的模型进行演示。
 # 最后
 ### 关于论文的讲解，推荐去B站看李沐老师的视频，地址：https://www.bilibili.com/video/BV1pu411o7BE/
 ### github仓库：https://github.com/mli/paper-reading
