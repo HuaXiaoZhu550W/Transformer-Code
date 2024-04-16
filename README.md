@@ -24,7 +24,7 @@
 ## 使用说明
 1. 若要使用自己的数据集，请修改`utils.py`中的文本读取和分词相关代码。
 2. 可以在`config.py`文件中修改超参数。
-3. 学习率调整策略已在`schedule.py`中实现，遵循论文中的公式：$lrate = d_{model}^{-0.5}\cdot min(step^{-0.5}, step\cdot warmup^{-1.5})$。
+3. 学习率调整策略已在`schedule.py`中实现，遵循论文中的公式：$lrate = d_{model}^{-0.5} \cdot \min(step^{-0.5}, step \cdot warmup^{-1.5})$ 。
 4. 运行`main.py`开始训练。
 5. 运行`main.py`之前，需要先运行`create_vocab.py`生成词表。
 6. `eval.py`中定义了评估函数，使用BLEU作为评价指标，可在测试集上评估模型训练结果。
